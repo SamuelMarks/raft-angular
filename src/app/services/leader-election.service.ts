@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+
+import { Subject } from "rxjs";
+
 import { VoteRequest } from '../model/vote-request';
 import { VoteRequestResponse } from '../model/vote-request-response';
 
@@ -16,7 +18,7 @@ export class LeaderElectionService {
     requestVote(voteRequest: VoteRequest): void {
         this.requestVoteSource.next(voteRequest);
     }
-    
+
     sendVote(vote: VoteRequestResponse): void {
         this.sendVoteSource.next(vote);
     }

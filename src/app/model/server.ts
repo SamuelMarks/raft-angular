@@ -1,5 +1,5 @@
 export class Server {
-    id: number;
+    id!: number;
     follower: boolean = true;
     leader: boolean = false;
     candidate: boolean = false;
@@ -12,7 +12,7 @@ export class Server {
     private generateElectionTimeout(min: number, max: number): number {
         max = Math.floor(max);
         min = Math.ceil(min);
-        
+
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 

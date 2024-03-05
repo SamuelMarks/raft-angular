@@ -1,33 +1,34 @@
 import { Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
+
 import { Server } from '../model/server';
 import { ServerLog } from '../model/server-log';
 import { LeaderElectionService } from '../services/leader-election.service';
 import { AppendEntriesService } from '../services/append-entries.service';
 import { SendEntriesService } from '../services/send-entries.service';
-import { Subscription } from 'rxjs/Subscription';
 import { VoteRequest } from '../model/vote-request';
 import { VoteRequestResponse } from '../model/vote-request-response';
 import { Entry } from '../model/entry';
+import { Observable, Subscription } from "rxjs";
 
 @Component({
     selector: 'raft-server',
-    styleUrls: ['app/styles/server.component.css'],
-    templateUrl: 'app/templates/server.component.html'
+    styleUrls: ['../styles/server.component.css'],
+    templateUrl: '../templates/server.component.html'
 })
 export class ServerComponent implements OnInit {
     /**
         Inject the server instance
     */
-    @Input() server: Server;
-    @Input() noOfServers: number;
+    @Input() server!: Server;
+    @Input() noOfServers: number = 0;
     @Output() onLeaderElected = new EventEmitter<boolean>();
     // Private variables.
     private logs: ServerLog[] = [];
-    private messageLogs: string[] = [];
+    public messageLogs: string[] = [];
     private noOfVotes: number = 0;
     private heartbeatLastReceived: number = 0;
-    private enableLogging: boolean = true;
-    private appendEntriesTimer: number;
+    public enableLogging: boolean = true;
+    private appendEntriesTimer: number = 0;
 
     /**
         When the component is initialized start the timer.
@@ -47,7 +48,7 @@ export class ServerComponent implements OnInit {
         leaderElectionService.voteRequested$.subscribe((request: VoteRequest) => {
             this.handleVoteRequest(request);
         });
-        
+
         /**
             Some server has acknowledged the vote request.
         */
@@ -66,9 +67,9 @@ export class ServerComponent implements OnInit {
             Any entries sent by user should be replicated to other servers.
         */
         sendEntriesService.sendEntrySource$.subscribe((userEntry: string) => {
-            if (this.server.leader) {
-                this.handleUserEntries(userEntry);
-            }
+          if (this.server.leader) {
+            this.handleUserEntries(userEntry);
+          }
         });
     }
 
@@ -180,7 +181,7 @@ export class ServerComponent implements OnInit {
 
     /**
         Keep sending heartbeats/entries to followers in order
-        to avoid any elections or partitions. 
+        to avoid any elections or partitions.
     */
     private setAppendEntryTimer(): void {
         this.appendEntriesTimer = setInterval(
@@ -190,7 +191,7 @@ export class ServerComponent implements OnInit {
         );
     }
 
-    private clearAppendEntriesTimer() {
+    public clearAppendEntriesTimer() {
         clearInterval(this.appendEntriesTimer);
     }
 
@@ -294,7 +295,7 @@ export class ServerComponent implements OnInit {
         Update the followers with the latest entries
         or send them heartbeats.
     */
-    private appendEntryRequest(logEntry: ServerLog): Entry {
+    private appendEntryRequest(logEntry: ServerLog | undefined): Entry {
         let entry = new Entry();
         if (undefined === logEntry) {
             let logEntry = new ServerLog();
@@ -305,7 +306,7 @@ export class ServerComponent implements OnInit {
 
         entry.leaderId = this.server.id;
         entry.term = this.server.currentTerm;
-        entry.logEntry = logEntry;
+        entry.logEntry = logEntry!;
 
         return entry;
     }

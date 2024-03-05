@@ -1,8 +1,8 @@
 export class ServerLog {
-    term: number;
+    term!: number;
     /**
         TODO: make a command class capable of defining
-        semantics of commands to be supported. 
+        semantics of commands to be supported.
     */
-    data: string;
+    data!: string;
 }
